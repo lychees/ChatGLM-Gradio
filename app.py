@@ -1,0 +1,28 @@
+from transformers import AutoModel, AutoTokenizer
+import gradio as gr
+
+tokenizer = AutoTokenizer.from_pretrained("THUDM/chatglm-6b", trust_remote_code=True)
+model = AutoModel.from_pretrained("THUDM/chatglm-6b", trust_remote_code=True).half().cuda()
+model = model.eval()
+
+def predict(input, history=None):
+    if history is None:
+        history = []
+    response, history = model.chat(tokenizer, input, history)
+    return history, history
+
+
+with gr.Blocks() as demo:
+    gr.Markdown('''## ChatGLM-6B - unofficial demo
+    Unnoficial demo of the [ChatGLM-6B](https://github.com/THUDM/ChatGLM-6B/blob/main/README_en.md) model, trained on 1T tokens of English and Chinese
+    ''')
+    state = gr.State([])
+    chatbot = gr.Chatbot([], elem_id="chatbot").style(height=400)
+    with gr.Row():
+        with gr.Column(scale=4):
+            txt = gr.Textbox(show_label=False, placeholder="Enter text and press enter").style(container=False)
+        with gr.Column(scale=1):
+            button = gr.Button("Generate")
+    txt.submit(predict, [txt, state], [chatbot, state])
+    button.click(predict, [txt, state], [chatbot, state])
+demo.queue().launch()

@@ -1,0 +1,4 @@
+torch
+transformers>=4.26.1
+cpm_kernels
+icetk
