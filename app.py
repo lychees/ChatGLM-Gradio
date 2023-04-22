@@ -1,16 +1,25 @@
-from transformers import AutoModel, AutoTokenizer
+import re
+import os
+import json
 import gradio as gr
+from fastapi import FastAPI
+from gradio_client import Client
 
-tokenizer = AutoTokenizer.from_pretrained("THUDM/chatglm-6b", trust_remote_code=True)
-model = AutoModel.from_pretrained("THUDM/chatglm-6b", trust_remote_code=True).half().cuda()
-model = model.eval()
+def process_text(text):
+    text = text.encode('raw_unicode_escape').decode('unicode-escape').encode('utf-16_BE','surrogatepass').decode('utf-16_BE')
+    text = text.replace('\n', '')  # JSON doesn't accept \n
+    return text
 
 def predict(input, history=None):
     if history is None:
         history = []
-    response, history = model.chat(tokenizer, input, history)
-    return history, history
 
+    client = Client('https://multimodalart-chatglm-6b.hf.space/')
+    with open(client.predict(input, fn_index=0)) as f: 
+        text = process_text(f.read())
+        output = json.loads(text)[0]
+        history += [output]
+        return history, history
 
 with gr.Blocks() as demo:
     gr.Markdown('''## ChatGLM-6B - unofficial demo
@@ -25,4 +34,8 @@ with gr.Blocks() as demo:
             button = gr.Button("Generate")
     txt.submit(predict, [txt, state], [chatbot, state])
     button.click(predict, [txt, state], [chatbot, state])
-demo.queue().launch()
+
+CUSTOM_PATH = os.getenv('CUSTOM_PATH')
+app = FastAPI()
+
+app = gr.mount_gradio_app(app, demo, path=CUSTOM_PATH)

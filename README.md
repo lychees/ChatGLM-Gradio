@@ -1,13 +1,12 @@
----
-title: ChatGLM 6B
-emoji: 🏃
-colorFrom: indigo
-colorTo: pink
-sdk: gradio
-sdk_version: 3.21.0
-app_file: app.py
-pinned: false
-license: mit
----
+## Original From
 
-Check out the configuration reference at https://huggingface.co/docs/hub/spaces-config-reference
+https://huggingface.co/spaces/multimodalart/ChatGLM-6B/tree/main
+
+This repo uses `gradio_client` to make a call to Huggingface's space API.
+
+## Installation
+
+```sh
+pip install -r requirements.txt
+python app.py
+```
