@@ -35,7 +35,4 @@ with gr.Blocks() as demo:
     txt.submit(predict, [txt, state], [chatbot, state])
     button.click(predict, [txt, state], [chatbot, state])
 
-CUSTOM_PATH = os.getenv('CUSTOM_PATH')
-app = FastAPI()
-
-app = gr.mount_gradio_app(app, demo, path=CUSTOM_PATH)
+demo.queue().launch()
