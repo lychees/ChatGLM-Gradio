@@ -35,4 +35,4 @@ with gr.Blocks() as demo:
     txt.submit(predict, [txt, state], [chatbot, state])
     button.click(predict, [txt, state], [chatbot, state])
 
-demo.queue().launch()
+demo.launch()
